@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>Shopping Jason</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Yeon+Sung&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Yeon Sung', cursive;
+        }
+
+        .myitem {
+            width: 600px;
+            height: 500px;
+            background-image: url("https://image.chosun.com/sitedata/image/202008/12/2020081203215_0.jpg");
+            background-position: center;
+            background-size: cover;
+        }
+
+        .price {
+            font-size: 20px;
+        }
+
+        .gang {
+            width: 600px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .orderbox {
+            width: 600px;
+        }
+
+        .mybtn {
+            width: 100px;
+            margin: auto;
+            display: block;
+        }
+
+        .wrap {
+            margin: auto;
+            width: 600px;
+        }
+
+        .rate {
+            color: aqua;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    let usd_krw = response[1]['rate'];
+                    $('#rate-box').text(usd_krw);
+                }
+            })
+        });
+
+        function order() {
+
+            let name = $('#order-name').val();
+            let count = $('#order-count').val();
+            let address = $('#order-address').val();
+            let phone = $('#order-phone').val();
+
+            if (name === '') {
+                alert('이름을 입력하세요');
+            } else if (count === '-- 수량을 선택하세요 --') {
+                alert('수량을 선택하세요');
+            } else if (address === '') {
+                alert('주소를 입력하세요');
+            } else if (phone === '') {
+                alert('전화번호를 입력하세요');
+            } else if (!/^\d{3}-\d{3,4}-\d{4}$/.test(phone)) {
+                alert('전화번호를 010-0000-0000 형식에 맞게 입력해 주세요');
+            } else {
+                alert('주문이 완료되었습니다!');
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="myitem"></div>
+    <div class="gang">
+        <h1>깡팸을 즐겨보세요! <span class="price">가격: 5000원/깡팸</span></h1>
+        <p>손이 가요~ 손이 가~ 깡패밀리에 손이 가요~ 1일4깡으로 하루를 즐겨보세요!</p>
+        <p class="rate">달러-원 환율: <span id="rate-box"></span></p>
+    </div>
+    <div class="orderbox">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default1">주문자이름</span>
+            </div>
+            <input id="order-name" type="text" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default1">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="order-count">수량</label>
+            </div>
+            <select id="order-count" class="custom-select">
+                <option selected>-- 수량을 선택하세요 --</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default2">주소</span>
+            </div>
+            <input id="order-address" type="text" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default2">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default3">전화번호</span>
+            </div>
+            <input id="order-phone" type="text" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default3">
+        </div>
+        <button onclick="order()" type="button" class="btn btn-primary mybtn">주문하기</button>
+    </div>
+</div>
+</body>
+
+</html>
