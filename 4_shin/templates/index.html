@@ -1,9 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
+    <!-- Webpage Title -->
+    <title>Jason Retail</title>
+
     <!-- Required meta tags -->
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -20,13 +23,14 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-    <title>Shopping Jason</title>
+    <!-- 구글폰트 -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500&family=Single+Day&display=swap"
+          rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Yeon+Sung&display=swap" rel="stylesheet">
-
-    <style>
+    <style type="text/css">
         * {
-            font-family: 'Yeon Sung', cursive;
+            font-family: 'Single Day', cursive;
         }
 
         .myitem {
@@ -49,6 +53,7 @@
 
         .orderbox {
             width: 600px;
+            margin-bottom: 30px;
         }
 
         .mybtn {
@@ -68,24 +73,15 @@
     </style>
 
     <script>
-        $(document).ready(function () {
-            $.ajax({
-                type: "GET",
-                url: "https://api.manana.kr/exchange/rate.json",
-                data: {},
-                success: function (response) {
-                    let usd_krw = response[1]['rate'];
-                    $('#rate-box').text(usd_krw);
-                }
-            })
-        });
-
         function order() {
-            let name = $('#order-name').val();
-            let count = $('#order-count').val();
-            let address = $('#order-address').val();
-            let phone = $('#order-phone').val();
+            // 1. 이름,수량,주소,전화번호 가져오기
+            let name = $('#order-name').val()
+            let count = $('#order-count').val()
+            let address = $('#order-address').val()
+            let phone = $('#order-phone').val()
+            console.log(name, count, address, phone)
 
+            // 2. 이름,수량,주소,전화번호 중 하나라도 입력하지 않았을 경우 alert 표시
             if (name === '') {
                 alert('이름을 입력하세요');
             } else if (count === '-- 수량을 선택하세요 --') {
@@ -96,9 +92,63 @@
                 alert('전화번호를 입력하세요');
             } else if (!/^\d{3}-\d{3,4}-\d{4}$/.test(phone)) {
                 alert('전화번호를 010-0000-0000 형식에 맞게 입력해 주세요');
-            } else {
-                alert('주문이 완료되었습니다!');
+            } else { // 3. POST /order 에 저장 요청
+                $.ajax({
+                    type: "POST",
+                    url: "/order",
+                    data: {'name_give': name, 'count_give': count, 'address_give': address, 'phone_give': phone},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            alert(response["msg"]);
+                            window.location.reload();
+                        }
+                    }
+                })
             }
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    let usd_krw = response[1]['rate'];
+                    $('#rate-box').text(usd_krw);
+                }
+            })
+            showOrder();
+        });
+
+        function showOrder() {
+            // 1. 주문 목록을 서버에 요청하기
+            // 2. 요청 성공 여부 확인하기
+            // 3. 요청 성공했을 때 주문을 올바르게 화면에 나타내기
+            $.ajax({
+                type: "GET",
+                url: "/order",
+                data: {},
+                success: function (response) {
+                    if (response["result"] === "success") {
+                        let orders = response['orders']
+                        for (let i = 0; i < orders.length; i++) {
+                            let name = orders[i]['name']
+                            let count = orders[i]['count']
+                            let address = orders[i]['address']
+                            let phone = orders[i]['phone']
+                            let temp = `<tr>
+                                            <th scope="row">${name}</th>
+                                            <td>${count}</td>
+                                            <td>${address}</td>
+                                            <td>${phone}</td>
+                                        </tr>`
+                            $('#order-list-box').append(temp)
+                        }
+                    } else {
+                        alert("주문을 받아오지 못했습니다");
+                    }
+                }
+            })
         }
     </script>
 </head>
@@ -148,6 +198,18 @@
         </div>
         <button onclick="order()" type="button" class="btn btn-primary mybtn">주문하기</button>
     </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">이름</th>
+            <th scope="col">수량</th>
+            <th scope="col">주소</th>
+            <th scope="col">전화번호</th>
+        </tr>
+        </thead>
+        <tbody id="order-list-box">
+        </tbody>
+    </table>
 </div>
 </body>
 
